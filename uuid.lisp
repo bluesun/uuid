@@ -225,12 +225,6 @@ characters.~@:>" string (length string)))
 		   :clock-seq-low (ldb (byte 8 0) *clock-seq*)
 		   :node *node*)))
 
-(defun make-v3-uuid (namespace name)
-  "Generates a version 3 (named based MD5) uuid."
-  (format-v3or5-uuid
-   (digest-uuid :md5 (uuid-to-byte-array namespace) name)
-   3))
-
 (defun make-v4-uuid ()
   "Generates a version 4 (random) uuid"
   (make-instance 'uuid
@@ -240,12 +234,6 @@ characters.~@:>" string (length string)))
 		 :clock-seq-var (dpb #b10 (byte 2 6) (ldb (byte 8 0) (random #xff *uuid-random-state*)))
 		 :clock-seq-low (random #xff *uuid-random-state*)
 		 :node (random #xffffffffffff *uuid-random-state*)))
-
-(defun make-v5-uuid (namespace name)
-  "Generates a version 5 (name based SHA1) uuid."
-  (format-v3or5-uuid
-   (digest-uuid :sha1 (uuid-to-byte-array namespace) name)
-   5))
 
 (defun uuid= (uuid1 uuid2)
   (or (eq uuid1 uuid2)
@@ -293,10 +281,3 @@ characters.~@:>" string (length string)))
 		  :clock-seq-low (aref array 9)
 		  :node (arr-to-bytes 10 15 array)))
 
-(defun digest-uuid (digest uuid name)
-  "Helper function that produces a digest from a namespace (a byte array) and a string. Used for the
-generation of version 3 and 5 uuids."
-  (let ((digester (ironclad:make-digest digest)))
-    (ironclad:update-digest digester uuid)
-    (ironclad:update-digest digester (trivial-utf-8:string-to-utf-8-bytes name))
-    (ironclad:produce-digest digester)))
