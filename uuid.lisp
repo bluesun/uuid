@@ -160,11 +160,11 @@ characters.~@:>" string (length string)))
 	      (setf uuids-this-tick 0
 		    last-time time-now)
 	      (return-from get-timestamp time-now))
-	     (T
+	     (:otherwise
 	      (cond ((< uuids-this-tick *ticks-per-count*)
 		     (incf uuids-this-tick)
 		     (return-from get-timestamp (+ time-now uuids-this-tick)))
-		    (T
+		    (:otherwise
 		     (sleep 0.0001)
 		     (go restart)))))))))
 
